@@ -2,36 +2,20 @@ const PAYMENTS_API =
     'https://195.20.233.98/api_create_payment.php';
 
 document.addEventListener('DOMContentLoaded', function () {
-    const container =
+
+    const payButton =
         document.getElementById('sumup-pay-button');
 
     const message =
         document.getElementById('payment-message');
 
-    if (!container) {
+    if (!payButton) {
+        console.error('SumUp payment button not found');
         return;
     }
 
-    container.innerHTML = '';
-
-    const payButton =
-        document.createElement('button');
-
-    payButton.type = 'button';
-    payButton.textContent = 'Pay £5.00 with SumUp';
-
-    payButton.style.display = 'block';
-    payButton.style.width = '100%';
-    payButton.style.padding = '15px 20px';
-    payButton.style.fontSize = '18px';
-    payButton.style.fontWeight = 'bold';
-    payButton.style.cursor = 'pointer';
-    payButton.style.border = 'none';
-    payButton.style.borderRadius = '8px';
-    payButton.style.background = '#000000';
-    payButton.style.color = '#ffffff';
-
     payButton.addEventListener('click', async function () {
+
         payButton.disabled = true;
         payButton.textContent = 'Processing...';
 
@@ -40,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         try {
+
             const response = await fetch(PAYMENTS_API, {
                 method: 'POST',
                 headers: {
@@ -49,6 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const data = await response.json();
+
+            console.log('Payment API response:', data);
 
             if (data.success && data.checkout_url) {
                 window.location.href = data.checkout_url;
@@ -60,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
             );
 
         } catch (error) {
+
             console.error('Payment error:', error);
 
             if (message) {
@@ -68,9 +56,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             payButton.disabled = false;
-            payButton.textContent = 'Pay £5.00 with SumUp';
+            payButton.textContent =
+                'Pay £5.00 with SumUp';
         }
     });
-
-    container.appendChild(payButton);
 });
