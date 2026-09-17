@@ -228,7 +228,7 @@ async function createSumUpCheckout() {
 
     const response =
         await fetch(
-            '/api_create_payment.php',
+            'https://195.20.233.98/api_create_payment.php',
             {
 
                 method: 'POST',
@@ -313,7 +313,7 @@ async function onGooglePayButtonClicked() {
          */
         const response =
             await fetch(
-                '/api_process_google_pay.php',
+                'https://195.20.233.98/api_process_google_pay.php',
                 {
 
                     method: 'POST',
