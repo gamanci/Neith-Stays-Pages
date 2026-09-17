@@ -65,3 +65,27 @@ button:hover {
     opacity: 0.6;
     cursor: wait;
 }
+
+#sumup-pay-button {
+    display: block !important;
+    width: 100% !important;
+    height: 54px !important;
+    margin: 20px 0 !important;
+    padding: 0 20px !important;
+    box-sizing: border-box !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+    background: #000 !important;
+    color: #fff !important;
+    font-family: inherit !important;
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    line-height: 54px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    appearance: none !important;
+}
+
+#sumup-pay-button:hover {
+    opacity: 0.9 !important;
+}

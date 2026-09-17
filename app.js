@@ -3,7 +3,7 @@ const PAYMENTS_API =
 
 document.addEventListener('DOMContentLoaded', function () {
     const container =
-        document.getElementById('google-pay-button');
+        document.getElementById('sumup-pay-button');
 
     const message =
         document.getElementById('payment-message');
