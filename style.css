@@ -42,3 +42,26 @@ button {
 button:hover {
     background-color: #34495e;
 }
+#google-pay-button {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    margin: 20px 0;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: #000000;
+    color: #ffffff;
+    box-sizing: border-box;
+}
+
+#google-pay-button:hover {
+    opacity: 0.9;
+}
+
+#google-pay-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
