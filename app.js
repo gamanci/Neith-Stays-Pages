@@ -1,63 +1,108 @@
-const PAYMENTS_API =
-    'https://195.20.233.98/api_create_payment.php';
+const GOOGLE_MERCHANT_ID = "YOUR_GOOGLE_MERCHANT_ID_HERE";
+const SUMUP_MERCHANT_CODE = "M922Z9TB";
+const PAYMENTS_API = "https://195.20.233.98/api_create_payment.php";
 
-document.addEventListener('DOMContentLoaded', function () {
+let paymentsClient;
 
-    const payButton =
-        document.getElementById('sumup-pay-button');
+const baseCardPaymentMethod = {
+  type: "CARD",
+  parameters: {
+    allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+    allowedCardNetworks: ["VISA", "MASTERCARD"]
+  },
+  tokenizationSpecification: {
+    type: "PAYMENT_GATEWAY",
+    parameters: {
+      gateway: "sumup",
+      gatewayMerchantId: SUMUP_MERCHANT_CODE
+    }
+  }
+};
 
-    const message =
-        document.getElementById('payment-message');
+window.addEventListener("load", initGooglePay);
 
-    if (!payButton) {
-        console.error('SumUp payment button not found');
-        return;
+async function initGooglePay() {
+  const message = document.getElementById("payment-message");
+  const container = document.getElementById("sumup-pay-button");
+
+  if (!window.google || !google.payments) {
+    message.textContent = "Google Pay library failed to load.";
+    return;
+  }
+
+  paymentsClient = new google.payments.api.PaymentsClient({
+    environment: "PRODUCTION"
+  });
+
+  try {
+    const ready = await paymentsClient.isReadyToPay({
+      apiVersion: 2,
+      apiVersionMinor: 0,
+      allowedPaymentMethods: [baseCardPaymentMethod]
+    });
+
+    if (!ready.result) {
+      message.textContent = "Google Pay isn't available on this device.";
+      return;
     }
 
-    payButton.addEventListener('click', async function () {
-
-        payButton.disabled = true;
-        payButton.textContent = 'Processing...';
-
-        if (message) {
-            message.textContent = '';
-        }
-
-        try {
-
-            const response = await fetch(PAYMENTS_API, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            });
-
-            const data = await response.json();
-
-            console.log('Payment API response:', data);
-
-            if (data.success && data.checkout_url) {
-                window.location.href = data.checkout_url;
-                return;
-            }
-
-            throw new Error(
-                data.error || 'Unable to create payment.'
-            );
-
-        } catch (error) {
-
-            console.error('Payment error:', error);
-
-            if (message) {
-                message.textContent =
-                    'Payment could not be started. Please try again.';
-            }
-
-            payButton.disabled = false;
-            payButton.textContent =
-                'Pay £5.00 with SumUp';
-        }
+    const gpayButton = paymentsClient.createButton({
+      onClick: onGooglePayClicked,
+      buttonColor: "black",
+      buttonType: "pay"
     });
-});
+
+    container.replaceWith(gpayButton);
+
+  } catch (err) {
+    console.error(err);
+    message.textContent = "Unable to initialise Google Pay.";
+  }
+}
+
+async function onGooglePayClicked() {
+  try {
+    const response = await fetch(PAYMENTS_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({})
+    });
+
+    const checkout = await response.json();
+
+    if (!checkout.success) {
+      throw new Error(checkout.error || "Unable to create SumUp checkout.");
+    }
+
+    const paymentRequest = {
+      apiVersion: 2,
+      apiVersionMinor: 0,
+      allowedPaymentMethods: [baseCardPaymentMethod],
+      merchantInfo: {
+        merchantId: GOOGLE_MERCHANT_ID,
+        merchantName: "Neith Stays"
+      },
+      transactionInfo: {
+        totalPriceStatus: "FINAL",
+        totalPrice: "5.00",
+        currencyCode: "GBP",
+        countryCode: "GB"
+      }
+    };
+
+    await paymentsClient.loadPaymentData(paymentRequest);
+
+    // After Google Pay authorises, continue to SumUp checkout.
+    window.location.href = checkout.checkout_url;
+
+  } catch (err) {
+    console.error("Google Pay error:", err);
+
+    const message = document.getElementById("payment-message");
+    if (message) {
+      message.textContent = "Google Pay could not be started. Please try again.";
+    }
+  }
+}
