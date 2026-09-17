@@ -16,7 +16,7 @@ const SUMUP_MERCHANT_CODE = 'M922Z9TB';
  * Do not invent this value.
  */
 const GOOGLE_MERCHANT_ID =
-    'REPLACE_WITH_GOOGLE_MERCHANT_ID';
+    'BCR2DN6D5L5K3DL5';
 
 let paymentsClient = null;
 
@@ -449,3 +449,4 @@ window.onGooglePayLoaded =
         checkGooglePayReady();
 
     };
+
